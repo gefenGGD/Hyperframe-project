@@ -1,0 +1,274 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1920, height=1080" />
+    <script src="./node_modules/gsap/dist/gsap.min.js"></script>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        margin: 0;
+        width: 1920px;
+        height: 1080px;
+        overflow: hidden;
+        background: #0b0c10;
+      }
+      body {
+        font-family: "Inter", system-ui, sans-serif;
+      }
+
+      [data-composition-id="main"] {
+        --bg: #0b0c10;
+        --ink: #f5f7fa;
+        --muted: #8b93a1;
+        --accent: #4f8cff;
+        --pill-bg: #14161c;
+        --pill-border: #262a33;
+        position: relative;
+        width: 1920px;
+        height: 1080px;
+        background: var(--bg);
+        overflow: hidden;
+      }
+
+      [data-composition-id="main"] .glow {
+        position: absolute;
+        left: 50%;
+        top: 46%;
+        width: 1100px;
+        height: 1100px;
+        transform: translate(-50%, -50%);
+        background: radial-gradient(circle, rgba(79, 140, 255, 0.22) 0%, rgba(11, 12, 16, 0) 68%);
+        opacity: 0;
+        pointer-events: none;
+      }
+
+      [data-composition-id="main"] .scene-content {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        height: 100%;
+        padding: 140px 160px;
+        gap: 28px;
+        text-align: center;
+      }
+
+      [data-composition-id="main"] .kicker {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        font-size: 26px;
+        font-weight: 600;
+        letter-spacing: 6px;
+        color: var(--accent);
+        text-transform: uppercase;
+        opacity: 0;
+      }
+
+      [data-composition-id="main"] .kicker-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: var(--accent);
+      }
+
+      [data-composition-id="main"] .title-group {
+        position: relative;
+        display: flex;
+        gap: 28px;
+      }
+
+      [data-composition-id="main"] .title-word {
+        position: relative;
+        font-size: 132px;
+        font-weight: 800;
+        line-height: 1;
+        color: var(--ink);
+        letter-spacing: -2px;
+        opacity: 0;
+      }
+
+      [data-composition-id="main"] .title-underline {
+        position: absolute;
+        left: -6px;
+        right: -6px;
+        bottom: -14px;
+        height: 14px;
+        border-radius: 7px;
+        background: var(--accent);
+        transform: scaleX(0);
+        transform-origin: left center;
+      }
+
+      [data-composition-id="main"] .subtitle {
+        max-width: 1080px;
+        font-size: 40px;
+        font-weight: 500;
+        line-height: 1.4;
+        color: var(--muted);
+        opacity: 0;
+      }
+
+      [data-composition-id="main"] .cta {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 24px;
+        opacity: 0;
+      }
+
+      [data-composition-id="main"] .url-pill {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        background: var(--pill-bg);
+        border: 1px solid var(--pill-border);
+        border-radius: 100px;
+        padding: 20px 44px;
+      }
+
+      [data-composition-id="main"] .url-dot {
+        width: 14px;
+        height: 14px;
+        border-radius: 50%;
+        background: var(--accent);
+      }
+
+      [data-composition-id="main"] .url-text {
+        font-size: 44px;
+        font-weight: 700;
+        color: var(--ink);
+        letter-spacing: 0.5px;
+      }
+
+      [data-composition-id="main"] .cta-caption {
+        font-size: 28px;
+        font-weight: 500;
+        color: var(--muted);
+        letter-spacing: 0.5px;
+      }
+    </style>
+  </head>
+  <body>
+    <div
+      id="root"
+      data-composition-id="main"
+      data-start="0"
+      data-duration="10"
+      data-width="1920"
+      data-height="1080"
+    >
+      <div class="glow" id="glow"></div>
+
+      <div class="scene-content" id="intro-group">
+        <div class="kicker" id="kicker">
+          <span class="kicker-dot"></span>
+          <span>A domain for examples</span>
+        </div>
+
+        <div class="title-group" id="title-group">
+          <span class="title-word" id="word-example">Example</span>
+          <span class="title-word" id="word-domain">
+            Domain
+            <span class="title-underline" id="underline"></span>
+          </span>
+        </div>
+
+        <p class="subtitle" id="subtitle">
+          Reserved for documentation and illustrative examples&mdash;free to reference without
+          asking permission.
+        </p>
+      </div>
+
+      <div class="cta" id="cta">
+        <div class="url-pill">
+          <span class="url-dot"></span>
+          <span class="url-text">example.com</span>
+        </div>
+        <span class="cta-caption">The web's example domain</span>
+      </div>
+    </div>
+
+    <script>
+      (function () {
+        const tl = gsap.timeline({ paused: true });
+
+        // Ambient glow, present for the whole hero section
+        tl.fromTo("#glow", { autoAlpha: 0, scale: 0.85 }, { autoAlpha: 1, scale: 1, duration: 1.4, ease: "power2.out" }, 0);
+
+        // 1. Kicker label — hook lands fast
+        tl.fromTo(
+          "#kicker",
+          { autoAlpha: 0, y: 18 },
+          { autoAlpha: 1, y: 0, duration: 0.5, ease: "power3.out" },
+          0.1,
+        );
+
+        // 2. Hero title — two words stagger in
+        tl.fromTo(
+          "#word-example",
+          { autoAlpha: 0, y: 40 },
+          { autoAlpha: 1, y: 0, duration: 0.6, ease: "power4.out" },
+          0.45,
+        );
+        tl.fromTo(
+          "#word-domain",
+          { autoAlpha: 0, y: 40 },
+          { autoAlpha: 1, y: 0, duration: 0.6, ease: "power4.out" },
+          0.6,
+        );
+
+        // 3. Pattern interrupt (~2.5s in): accent underline sweeps under "Domain"
+        tl.fromTo(
+          "#underline",
+          { scaleX: 0 },
+          { scaleX: 1, duration: 0.5, ease: "power3.inOut" },
+          2.4,
+        );
+
+        // 4. Subtitle settles under the title
+        tl.fromTo(
+          "#subtitle",
+          { autoAlpha: 0, y: 16 },
+          { autoAlpha: 1, y: 0, duration: 0.6, ease: "power3.out" },
+          2.6,
+        );
+
+        // 5. Ambient glow breathes gently through the hold
+        tl.to("#glow", { scale: 1.08, duration: 2.2, ease: "sine.inOut", yoyo: true, repeat: 1 }, 2.2);
+
+        // 6. Exit: intro group lifts and fades out
+        tl.to(
+          "#intro-group",
+          { autoAlpha: 0, y: -36, duration: 0.55, ease: "power2.inOut" },
+          6.9,
+        );
+
+        // 7. CTA: URL pill + caption resolve as the closing card
+        tl.fromTo(
+          "#cta",
+          { autoAlpha: 0, y: 24, scale: 0.94 },
+          { autoAlpha: 1, y: 0, scale: 1, duration: 0.65, ease: "back.out(1.6)" },
+          7.55,
+        );
+
+        // Final hold — glow settles for the closing frame
+        tl.to("#glow", { scale: 1, duration: 1, ease: "power2.out" }, 8.6);
+
+        window.__timelines = window.__timelines || {};
+        window.__timelines["main"] = tl;
+      })();
+    </script>
+  </body>
+</html>
