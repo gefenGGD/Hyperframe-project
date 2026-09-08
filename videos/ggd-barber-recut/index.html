@@ -24,6 +24,7 @@
         height: 1920px;
         overflow: hidden;
         background: #000;
+        perspective: 1400px;
       }
       [data-composition-id="main"] video {
         position: absolute;
@@ -32,6 +33,14 @@
         height: 100%;
         object-fit: cover;
         transform-origin: 52% 42%;
+        backface-visibility: hidden;
+      }
+      #flash {
+        position: absolute;
+        inset: 0;
+        background: #fff;
+        opacity: 0;
+        pointer-events: none;
       }
     </style>
   </head>
@@ -54,6 +63,8 @@
         muted
         playsinline
       ></video>
+
+      <div id="flash"></div>
 
       <audio
         id="source-audio"
@@ -79,13 +90,37 @@
     <script>
       window.__timelines = window.__timelines || {};
       const tl = gsap.timeline({ paused: true });
-      // Slow push-in + subtle drift on the footage, like a handheld camera move (seek-safe compositor transform, not layout dimensions)
+
+      // -- opening: settle from a slight dutch tilt, push-in begins --
       tl.fromTo(
         "#source",
-        { scale: 1, x: 0, y: 0 },
-        { scale: 1.12, x: -18, y: 10, duration: 8.3, ease: "none" },
+        { scale: 1, x: 0, y: 0, rotationZ: -2.4 },
+        { rotationZ: 0, duration: 0.9, ease: "power2.out" },
         0,
       );
+      tl.to("#source", { scale: 1.05, x: -8, y: 4, duration: 3.0, ease: "none" }, 0);
+
+      // -- ongoing camera-angle wobble while we build to the signature move --
+      tl.to("#source", { rotationZ: 1.1, duration: 0.9, ease: "sine.inOut" }, 1.1);
+      tl.to("#source", { rotationZ: -0.8, duration: 0.9, ease: "sine.inOut" }, 2.0);
+      tl.to("#source", { rotationZ: 0, duration: 0.6, ease: "sine.inOut" }, 2.9);
+
+      // -- the move: a full 3D spin (flips out and lands back to normal) + an impact punch --
+      tl.to("#source", { rotationY: 360, duration: 0.85, ease: "power2.inOut" }, 3.2);
+      tl.to("#source", { scale: 1.18, duration: 0.42, ease: "power3.out" }, 3.2);
+      tl.to("#source", { scale: 1.1, duration: 0.35, ease: "power2.inOut" }, 3.62);
+      tl.set("#source", { rotationY: 0 }, 4.06); // 360 === 0 visually; reset the numeric value
+
+      // -- flash hit right as the spin lands, for punctuation --
+      tl.fromTo("#flash", { opacity: 0 }, { opacity: 0.75, duration: 0.09, ease: "power1.out" }, 3.98);
+      tl.to("#flash", { opacity: 0, duration: 0.28, ease: "power2.out" }, 4.07);
+
+      // -- resume the push-in + a second, gentler wobble to the close --
+      tl.to("#source", { scale: 1.28, x: -22, y: 12, duration: 4.1, ease: "none" }, 4.1);
+      tl.to("#source", { rotationZ: 1.0, duration: 1.0, ease: "sine.inOut" }, 5.0);
+      tl.to("#source", { rotationZ: -0.6, duration: 1.0, ease: "sine.inOut" }, 6.0);
+      tl.to("#source", { rotationZ: 0, duration: 0.8, ease: "sine.inOut" }, 7.2);
+
       window.__timelines["main"] = tl;
     </script>
   </body>
